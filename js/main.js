@@ -224,3 +224,4 @@ function numberTransition(id, endPoint, transitionDuration, transitionEase) {
 };
 
 loop();
+console.log(new Date());
