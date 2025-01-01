@@ -4,7 +4,7 @@
  * GLOBAL VARS
  * -------------------------- */
 // The date you want to count down to
-var targetDate = new Date("2025/1/1 06:54:00");
+var targetDate = new Date("2025/1/29 00:00:00");
 
 // Other date related variables
 var days = 0;
