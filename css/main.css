@@ -15,7 +15,7 @@ body {
 
 ul#countdown {
     position: relative;
-    bottom: 80%;
+    bottom: 115%;
     transform: translateY(-50%);
     width: 100%;
     margin: 0 auto;
@@ -70,6 +70,10 @@ body {
 
 .fade-out {
     animation: fade-out forwards 1s;
+}
+
+.scale-up-fit-center {
+    animation: scale-up-fit-center forwards 2s;
 }
 
 .text {
