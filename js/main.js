@@ -1,6 +1,20 @@
+'use strict';
+
+/* --------------------------
+ * GLOBAL VARS
+ * -------------------------- */
+// The date you want to count down to
+var targetDate = new Date("2025/1/1 06:54:00");
+
+// Other date related variables
+var days = 0;
+var hrs = 0;
+var min = 0;
+var sec = 0;
+
 const canvas = document.getElementById('fireworksCanvas');
 const ctx = canvas.getContext('2d');
-ctx.canvas.width  = window.innerWidth - 10;
+ctx.canvas.width = window.innerWidth - 10;
 ctx.canvas.height = window.innerHeight - 10;
 
 class Firework {
@@ -67,7 +81,7 @@ class Particle {
         this.brightness = Math.random() * 80 + 20;
         this.alpha = 1;
         this.decay = Math.random() * 0.03 + 0.01;
-        this.size = 2;
+        this.size = 4;
     }
     update(index) {
         this.coordinates.pop();
@@ -85,8 +99,6 @@ class Particle {
         ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
         ctx.lineTo(this.x, this.y);
         ctx.strokeStyle = `hsla(${this.hue}, 100%, ${this.brightness}%, ${this.alpha})`;
-        ctx.shadowBlur = 100;
-        ctx.shadowColor = `hsla(${this.hue}, 100%, ${this.brightness}%, ${this.alpha})`;
         ctx.lineWidth = this.size;
         ctx.stroke();
     }
@@ -103,6 +115,7 @@ function createParticles(x, y) {
 
 function loop() {
     requestAnimationFrame(loop);
+    if (days !== 0 || hrs !== 0 || min !== 0 || sec !== 0) return;
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -124,4 +137,90 @@ function loop() {
     }
 }
 
-setTimeout(() => loop(), 10000);
+/* --------------------------
+ * ON DOCUMENT LOAD
+ * -------------------------- */
+
+// Calculate time until launch date
+timeToLaunch();
+// Transition the current countdown from 0 
+numberTransition('#days .number', days, 1000, 'easeOutQuad');
+numberTransition('#hours .number', hrs, 1000, 'easeOutQuad');
+numberTransition('#minutes .number', min, 1000, 'easeOutQuad');
+numberTransition('#seconds .number', sec, 1000, 'easeOutQuad');
+// Begin Countdown
+setTimeout(countDownTimer, 1000);
+
+/* --------------------------
+ * FIGURE OUT THE AMOUNT OF 
+   TIME LEFT BEFORE LAUNCH
+ * -------------------------- */
+function timeToLaunch() {
+    // Get the current date
+    var currentDate = new Date();
+
+    // Find the difference between dates
+    var diff = (currentDate - targetDate) / 1000;
+    if (diff > 1) {
+        document.querySelector("#countdown").setAttribute("class", "fade-out");
+        document.querySelector(".tet2025txt").removeAttribute("style");
+        document.querySelector(".tet2025txt").classList.add("fade-in");
+        setTimeout(() => {
+            document.querySelector(".chucmungnammoiTxt").removeAttribute("style");
+            document.querySelector(".chucmungnammoiTxt").classList.add("fade-in");
+        }, 1000);
+        return;
+    };
+    var diff = Math.abs(Math.floor(diff));
+
+    // Check number of days until target
+    days = Math.floor(diff / (24 * 60 * 60));
+    sec = diff - days * 24 * 60 * 60;
+
+    // Check number of hours until target
+    hrs = Math.floor(sec / (60 * 60));
+    sec = sec - hrs * 60 * 60;
+
+    // Check number of minutes until target
+    min = Math.floor(sec / (60));
+    sec = sec - min * 60;
+}
+
+/* --------------------------
+ * DISPLAY THE CURRENT 
+   COUNT TO LAUNCH
+ * -------------------------- */
+function countDownTimer() {
+
+    // Figure out the time to launch
+    timeToLaunch();
+
+    // Write to countdown component
+    $("#days .number").text(days <= 9 ? `0${days}` : days);
+    $("#hours .number").text(hrs <= 9 ? `0${hrs}` : hrs);
+    $("#minutes .number").text(min <= 9 ? `0${min}` : min);
+    $("#seconds .number").text(sec <= 9 ? `0${sec}` : sec);
+
+    // Repeat the check every second
+    setTimeout(countDownTimer, 1000);
+}
+
+/* --------------------------
+ * TRANSITION NUMBERS FROM 0
+   TO CURRENT TIME UNTIL LAUNCH
+ * -------------------------- */
+function numberTransition(id, endPoint, transitionDuration, transitionEase) {
+    // Transition numbers from 0 to the final number
+    $({ numberCount: $(id).text() }).animate({ numberCount: endPoint }, {
+        duration: transitionDuration,
+        easing: transitionEase,
+        step: function () {
+            $(id).text(Math.floor(this.numberCount));
+        },
+        complete: function () {
+            $(id).text(this.numberCount);
+        }
+    });
+};
+
+loop();
